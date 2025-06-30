@@ -5,6 +5,11 @@ export default async function handler(req, res) {
 
 	const payload = JSON.parse(req.body.payload);
 
+  const metadata = JSON.parse(payload.view.private_metadata || "{}");
+	const channelId = metadata.channel_id;
+	const userId = metadata.user_id;
+
+
 	if (
 		payload.type === "view_submission" &&
 		payload.view.callback_id === "support_modal"
@@ -23,6 +28,8 @@ export default async function handler(req, res) {
 			}
 			await axios.post(process.env.GHL_WEBHOOK_URL, {
 				slack_user: slackUser,
+				slack_user_id: userId,
+				slack_channel_id: channelId,
 				request_type: requestType,
 				priority,
 				subject,

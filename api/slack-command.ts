@@ -9,7 +9,7 @@ export default async function handler(
 ) {
 	if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
-	const { text, trigger_id } = req.body;
+	const { text, trigger_id, channel_id, user_id } = req.body;
 
 	const commandText = text?.trim().toLowerCase();
 	if (commandText !== "new") {
@@ -26,6 +26,7 @@ export default async function handler(
 				view: {
 					type: "modal",
 					callback_id: "support_modal",
+					private_metadata: JSON.stringify({ channel_id, user_id }),
 					title: {
 						type: "plain_text",
 						text: "New Support Ticket",
