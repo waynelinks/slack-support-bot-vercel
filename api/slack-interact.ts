@@ -52,6 +52,8 @@ export default async function handler(req, res) {
 					},
 				},
 			);
+      // Log the channel ID for debugging
+      console.log("Attempting to post to Slack channel:", channelId);
 
       await axios
 							.post(
