@@ -1,39 +1,40 @@
-import axios from "axios";
+// pages/api/slack-interact.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import qs from 'qs';
+import axios from 'axios';
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method not allowed");
+const GHL_WEBHOOK_URL = process.env.GHL_WEBHOOK_URL;
 
-  const payload = JSON.parse(req.body.payload);
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
-  if (payload.type === "view_submission" && payload.view.callback_id === "support_modal") {
-    const values = payload.view.state.values;
+  try {
+    const payload = qs.parse(req.body).payload as string;
+    const parsed = JSON.parse(payload);
 
-    const requestType = values.request_type.input.selected_option.value;
-    const priority = values.priority.input.selected_option.value;
-    const subject = values.subject.input.value;
-    const description = values.description.input.value;
-    const slackUser = payload.user.username;
+    if (parsed.type === 'view_submission' && parsed.view.callback_id === 'support_ticket_modal') {
+      const values = parsed.view.state.values;
+      const user = parsed.user.username;
 
-    try {
-      await axios.post(process.env.GHL_WEBHOOK_URL, {
-        slack_user: slackUser,
-        request_type: requestType,
-        priority,
-        subject,
-        description
-      });
+      const ticketData = {
+        slack_user: user,
+        request_type: values.request_type_block.request_type.selected_option?.value,
+        priority: values.priority_block.priority.selected_option?.value,
+        subject: values.subject_block.subject.value,
+        description: values.description_block.description.value,
+        affected_users: values.affected_users_block?.affected_users?.value || '',
+        additional_context: values.additional_context_block?.additional_context?.value || '',
+      };
 
-      return res.status(200).json({ response_action: "clear" });
-    } catch (err) {
-      console.error("Error sending to GHL:", err);
-      return res.status(200).json({
-        response_action: "errors",
-        errors: {
-          subject: "Failed to send ticket to GHL"
-        }
-      });
+      // Optional: send to GHL webhook
+      await axios.post(GHL_WEBHOOK_URL!, ticketData);
+
+      return res.status(200).json({ response_action: 'clear' });
     }
-  }
 
-  return res.status(200).send();
+    return res.status(200).end();
+  } catch (err) {
+    console.error('Slack Interact Error:', err);
+    return res.status(500).send('Internal Server Error');
+  }
 }
