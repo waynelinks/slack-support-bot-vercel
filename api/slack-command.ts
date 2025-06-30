@@ -2,13 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { App, LogLevel } from "@slack/bolt";
 import crypto from "node:crypto";
-import type { ModalView } from '@slack/web-api';
+import { type ModalView, WebClient } from "@slack/web-api";
 
-const app = new App({
-	token: process.env.SLACK_BOT_TOKEN,
-	signingSecret: process.env.SLACK_SIGNING_SECRET,
-	logLevel: LogLevel.DEBUG,
-});
+const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 function verifySlackRequest(req: NextApiRequest): boolean {
 	const slackSignature = req.headers["x-slack-signature"] as string;
@@ -144,7 +140,7 @@ export default async function handler(
 									process.env.SLACK_BOT_TOKEN ? "✅" : "❌",
 								);
 
-								await app.client.views.open({
+								await slack.views.open({
 									trigger_id,
 									view: modalView,
 								});
