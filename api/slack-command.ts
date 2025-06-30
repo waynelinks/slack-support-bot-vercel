@@ -136,11 +136,19 @@ export default async function handler(
 
 		if (command === "/balance" || command === "/balance new") {
 			try {
-				await app.client.views.open({
-					trigger_id,
-					view: modalView,
-				});
-				return res.status(200).send('OK');
+        console.log("Received slash command", req.body);
+								console.log("Trigger ID:", req.body.trigger_id);
+								console.log("Command:", req.body.command);
+								console.log(
+									"Token?",
+									process.env.SLACK_BOT_TOKEN ? "✅" : "❌",
+								);
+
+								await app.client.views.open({
+									trigger_id,
+									view: modalView,
+								});
+								return res.status(200).send("OK");
 			} catch (error) {
 				console.error("Failed to open modal:", error);
 				return res.status(500).send("Error opening modal");
