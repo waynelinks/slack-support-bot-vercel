@@ -72,20 +72,20 @@ export default async function handler(
 								action_id: "input",
 								options: [
 									{
-										text: { type: "plain_text", text: "Critical" },
-										value: "Critical",
-									},
-									{
 										text: { type: "plain_text", text: "Urgent" },
 										value: "Urgent",
 									},
 									{
-										text: { type: "plain_text", text: "Important" },
-										value: "Important",
+										text: { type: "plain_text", text: "High" },
+										value: "High",
 									},
 									{
-										text: { type: "plain_text", text: "Desirable" },
-										value: "Desirable",
+										text: { type: "plain_text", text: "Normal" },
+										value: "Normal",
+									},
+									{
+										text: { type: "plain_text", text: "Low" },
+										value: "Low",
 									},
 								],
 							},

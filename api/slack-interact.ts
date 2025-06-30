@@ -5,10 +5,9 @@ export default async function handler(req, res) {
 
 	const payload = JSON.parse(req.body.payload);
 
-  const metadata = JSON.parse(payload.view.private_metadata || "{}");
+	const metadata = JSON.parse(payload.view.private_metadata || "{}");
 	const channelId = metadata.channel_id;
 	const userId = metadata.user_id;
-
 
 	if (
 		payload.type === "view_submission" &&
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
 
 		try {
 			if (!process.env.GHL_WEBHOOK_URL) {
-				throw new Error('GHL_WEBHOOK_URL is not defined');
+				throw new Error("GHL_WEBHOOK_URL is not defined");
 			}
 			await axios.post(process.env.GHL_WEBHOOK_URL, {
 				slack_user: slackUser,
