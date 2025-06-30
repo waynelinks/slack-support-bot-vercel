@@ -23,20 +23,22 @@ export default async function handler(req, res) {
         blocks: [
           {
             type: "input",
-            block_id: "subject",
-            label: { type: "plain_text", text: "Subject" },
-            element: { type: "plain_text_input", action_id: "input" }
-          },
-          {
-            type: "input",
-            block_id: "description",
-            label: { type: "plain_text", text: "Description" },
-            element: { type: "plain_text_input", action_id: "input", multiline: true }
+            block_id: "request_type",
+            label: { type: "plain_text", text: "Request Type" },
+            element: {
+              type: "static_select",
+              action_id: "input",
+              options: [
+                { text: { type: "plain_text", text: "Technical Support" }, value: "Technical Support" },
+                { text: { type: "plain_text", text: "CA Assistance" }, value: "CA Assistance" },
+                { text: { type: "plain_text", text: "Other" }, value: "Other" }
+              ]
+            }
           },
           {
             type: "input",
             block_id: "priority",
-            label: { type: "plain_text", text: "Priority" },
+            label: { type: "plain_text", text: "Urgency Level" },
             element: {
               type: "static_select",
               action_id: "input",
@@ -46,6 +48,25 @@ export default async function handler(req, res) {
                 { text: { type: "plain_text", text: "Important" }, value: "Important" },
                 { text: { type: "plain_text", text: "Desirable" }, value: "Desirable" }
               ]
+            }
+          },
+          {
+            type: "input",
+            block_id: "subject",
+            label: { type: "plain_text", text: "Subject" },
+            element: {
+              type: "plain_text_input",
+              action_id: "input"
+            }
+          },
+          {
+            type: "input",
+            block_id: "description",
+            label: { type: "plain_text", text: "Description" },
+            element: {
+              type: "plain_text_input",
+              action_id: "input",
+              multiline: true
             }
           }
         ]
