@@ -46,7 +46,10 @@ export default async function handler(req, res) {
 			subject,
 			description,
 		});
-
+    if (!process.env.CLICKUP_API_TOKEN) {
+					console.error("Missing CLICKUP_API_TOKEN");
+				}
+    
 		// 📝 2. Create ClickUp Task
 		const clickupResponse = await axios.post(
 			`https://api.clickup.com/api/v2/list/${process.env.CLICKUP_LIST_ID}/task`,
