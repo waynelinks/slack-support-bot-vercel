@@ -1,13 +1,14 @@
 import axios from "axios";
 
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
+
 export default async function handler(req, res) {
 	if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
 	const payload = JSON.parse(req.body.payload);
-
 	const metadata = JSON.parse(payload.view.private_metadata || "{}");
-	const channelId = metadata.channel_id;
-	const userId = metadata.user_id;
+	const channelId = metadata.channel_id || payload.user.id;
+	const userId = metadata.user_id || payload.user.id;
 
 	if (
 		payload.type === "view_submission" &&
@@ -25,6 +26,8 @@ export default async function handler(req, res) {
 			if (!process.env.GHL_WEBHOOK_URL) {
 				throw new Error("GHL_WEBHOOK_URL is not defined");
 			}
+
+			// 🔁 1. Send to GHL
 			await axios.post(process.env.GHL_WEBHOOK_URL, {
 				slack_user: slackUser,
 				slack_user_id: userId,
@@ -35,13 +38,28 @@ export default async function handler(req, res) {
 				description,
 			});
 
+			// ✅ 2. Post confirmation back to Slack
+			await axios.post(
+				"https://slack.com/api/chat.postMessage",
+				{
+					channel: channelId,
+					text: `✅ Ticket *${subject}* submitted by <@${userId}>.\nPriority: *${priority}* | Type: *${requestType}*`,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
 			return res.status(200).json({ response_action: "clear" });
 		} catch (err) {
-			console.error("Error sending to GHL:", err);
+			console.error("Error sending to GHL or Slack:", err);
 			return res.status(200).json({
 				response_action: "errors",
 				errors: {
-					subject: "Failed to send ticket to GHL",
+					subject: "Failed to submit ticket.",
 				},
 			});
 		}
