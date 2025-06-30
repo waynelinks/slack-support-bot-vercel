@@ -1,25 +1,36 @@
-import { WebClient } from "@slack/web-api";
+import { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
 
-const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).send("Method not allowed");
 
-  const { command, trigger_id } = req.body;
+  const { text, trigger_id } = req.body;
 
-  if (command !== "/support-request") {
-    return res.status(400).send("Invalid command");
+  const commandText = text?.trim().toLowerCase();
+  if (commandText !== "new") {
+    return res.status(200).send("Try `/balance new` to create a support ticket.");
   }
 
   try {
-    await slack.views.open({
+    await axios.post("https://slack.com/api/views.open", {
       trigger_id,
       view: {
         type: "modal",
         callback_id: "support_modal",
-        title: { type: "plain_text", text: "Submit Support Ticket" },
-        submit: { type: "plain_text", text: "Submit" },
-        close: { type: "plain_text", text: "Cancel" },
+        title: {
+          type: "plain_text",
+          text: "New Support Ticket"
+        },
+        submit: {
+          type: "plain_text",
+          text: "Submit"
+        },
+        close: {
+          type: "plain_text",
+          text: "Cancel"
+        },
         blocks: [
           {
             type: "input",
@@ -38,7 +49,7 @@ export default async function handler(req, res) {
           {
             type: "input",
             block_id: "priority",
-            label: { type: "plain_text", text: "Urgency Level" },
+            label: { type: "plain_text", text: "Priority Level" },
             element: {
               type: "static_select",
               action_id: "input",
@@ -56,7 +67,8 @@ export default async function handler(req, res) {
             label: { type: "plain_text", text: "Subject" },
             element: {
               type: "plain_text_input",
-              action_id: "input"
+              action_id: "input",
+              max_length: 100
             }
           },
           {
@@ -66,16 +78,22 @@ export default async function handler(req, res) {
             element: {
               type: "plain_text_input",
               action_id: "input",
-              multiline: true
+              multiline: true,
+              max_length: 1000
             }
           }
         ]
       }
+    }, {
+      headers: {
+        Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
+        "Content-Type": "application/json"
+      }
     });
 
-    res.status(200).send();
+    return res.status(200).end();
   } catch (error) {
-    console.error("Slack error", error);
-    res.status(500).send("Failed to open modal");
+    console.error("Error opening modal:", error);
+    return res.status(500).send("Internal Server Error");
   }
 }
