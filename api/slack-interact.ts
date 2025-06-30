@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
 	const payload = JSON.parse(req.body.payload);
 	const metadata = JSON.parse(payload.view.private_metadata || "{}");
-	const channelId = metadata.channel_id || payload.user.id;
+	const channelId = metadata.channel_id;
 	const userId = metadata.user_id || payload.user.id;
 
 	if (
@@ -52,6 +52,31 @@ export default async function handler(req, res) {
 					},
 				},
 			);
+
+      await axios
+							.post(
+								"https://slack.com/api/chat.postMessage",
+								{
+									channel: channelId,
+									text: `✅ Ticket *${subject}* submitted by <@${userId}>.\nPriority: *${priority}* | Type: *${requestType}*`,
+								},
+								{
+									headers: {
+										Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
+										"Content-Type": "application/json",
+									},
+								},
+							)
+							.then((response) => {
+								console.log("Slack confirmation sent:", response.data);
+							})
+							.catch((err) => {
+								console.error(
+									"Failed to send confirmation to Slack:",
+									err.response?.data || err.message,
+								);
+							});
+      
 
 			return res.status(200).json({ response_action: "clear" });
 		} catch (err) {

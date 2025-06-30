@@ -73,19 +73,19 @@ export default async function handler(
 								options: [
 									{
 										text: { type: "plain_text", text: "Urgent" },
-										value: "Urgent",
+										value: "urgent",
 									},
 									{
 										text: { type: "plain_text", text: "High" },
-										value: "High",
+										value: "high",
 									},
 									{
 										text: { type: "plain_text", text: "Normal" },
-										value: "Normal",
+										value: "normal",
 									},
 									{
 										text: { type: "plain_text", text: "Low" },
-										value: "Low",
+										value: "low",
 									},
 								],
 							},
