@@ -51,34 +51,7 @@ export default async function handler(req, res) {
 						"Content-Type": "application/json",
 					},
 				},
-			);
-      // Log the channel ID for debugging
-      console.log("Attempting to post to Slack channel:", channelId);
-
-      await axios
-							.post(
-								"https://slack.com/api/chat.postMessage",
-								{
-									channel: channelId,
-									text: `✅ Ticket *${subject}* submitted by <@${userId}>.\nPriority: *${priority}* | Type: *${requestType}*`,
-								},
-								{
-									headers: {
-										Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
-										"Content-Type": "application/json",
-									},
-								},
-							)
-							.then((response) => {
-								console.log("Slack confirmation sent:", response.data);
-							})
-							.catch((err) => {
-								console.error(
-									"Failed to send confirmation to Slack:",
-									err.response?.data || err.message,
-								);
-							});
-      
+			);      
 
 			return res.status(200).json({ response_action: "clear" });
 		} catch (err) {
