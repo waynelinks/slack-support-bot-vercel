@@ -27,6 +27,13 @@ export default async function handler(req, res) {
 				throw new Error("GHL_WEBHOOK_URL is not defined");
 			}
 
+			// Simulate ClickUp task ID and URL (replace this with actual task creation logic)
+			const clickupTaskId = "TKT-12345";
+			const clickupTaskUrl = `https://app.clickup.com/t/${clickupTaskId}`;
+
+			const timestamp = new Date().toLocaleString("en-GB");
+			const slaTime = "4 hours";
+
 			// 🔁 1. Send to GHL
 			await axios.post(process.env.GHL_WEBHOOK_URL, {
 				slack_user: slackUser,
@@ -38,12 +45,79 @@ export default async function handler(req, res) {
 				description,
 			});
 
-			// ✅ 2. Post confirmation back to Slack
+			// ✅ 2. Send confirmation message to Slack with blocks
 			await axios.post(
 				"https://slack.com/api/chat.postMessage",
 				{
 					channel: channelId,
-					text: `✅ Ticket *${subject}* submitted by <@${userId}>.\nPriority: *${priority}* | Type: *${requestType}*`,
+					blocks: [
+						{
+							type: "header",
+							text: {
+								type: "plain_text",
+								text: "🎫 Support Ticket Created",
+							},
+						},
+						{
+							type: "section",
+							fields: [
+								{
+									type: "mrkdwn",
+									text: `*Ticket ID:*\n#${clickupTaskId}`,
+								},
+								{
+									type: "mrkdwn",
+									text: `*Priority:*\n🔴 ${priority}`,
+								},
+								{
+									type: "mrkdwn",
+									text: `*Type:*\n${requestType}`,
+								},
+								{
+									type: "mrkdwn",
+									text: `*Submitted by:*\n<@${userId}>`,
+								},
+							],
+						},
+						{
+							type: "section",
+							text: {
+								type: "mrkdwn",
+								text: `*Subject:* ${subject}`,
+							},
+						},
+						{
+							type: "actions",
+							elements: [
+								{
+									type: "button",
+									text: {
+										type: "plain_text",
+										text: "View in ClickUp",
+									},
+									style: "primary",
+									url: clickupTaskUrl,
+								},
+								{
+									type: "button",
+									text: {
+										type: "plain_text",
+										text: "Add Comment",
+									},
+									action_id: "add_comment",
+								},
+							],
+						},
+						{
+							type: "context",
+							elements: [
+								{
+									type: "mrkdwn",
+									text: `✅ Ticket submitted at ${timestamp} | Expected response: ${slaTime}`,
+								},
+							],
+						},
+					],
 				},
 				{
 					headers: {
@@ -51,7 +125,7 @@ export default async function handler(req, res) {
 						"Content-Type": "application/json",
 					},
 				},
-			);      
+			);
 
 			return res.status(200).json({ response_action: "clear" });
 		} catch (err) {
