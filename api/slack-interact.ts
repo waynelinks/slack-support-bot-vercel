@@ -1,17 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { verifySlackSignature } from "@utils/verifySlackSignature";
-import { slackClient } from "@clients/slackClient";
+import { verifySlackSignature } from "../src/utils/verifySlackSignature";
+import { slackClient } from "../src/clients/slackClient";
 import {
   clickupClient,
   mapSlackPriorityToClickUp,
-} from "@clients/clickupClient";
-import type { ViewSubmissionPayload } from "@schemas/slack";
-import { CHANNEL_ROUTES, CLIENT_LIST_ID } from "@utils/internalRouting";
-import { readRawBody } from './_shared/rawBody';
+} from "../src/clients/clickupClient";
+import type { ViewSubmissionPayload } from "../src/schemas/slack";
+import { CHANNEL_ROUTES, CLIENT_LIST_ID } from "../src/utils/internalRouting";
+import { readRawBody } from "./_shared/rawBody";
 
 export const config = { api: { bodyParser: false } };
-
-
 
 export default async function slackInteract(
   req: NextApiRequest,

@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { slackClient } from "@clients/slackClient";
-import { verifySlackSignature } from "@utils/verifySlackSignature";
-import { buildSupportTicketModal } from "@utils/buildSupportTickModal";
-import type { SlashCommandPayload } from "@schemas/slack";
+import { slackClient } from "../src/clients/slackClient";
+import { verifySlackSignature } from "../src/utils/verifySlackSignature";
+import { buildSupportTicketModal } from "../src/utils/buildSupportTickModal";
+import type { SlashCommandPayload } from "../src/schemas/slack";
 import { readRawBody } from "./_shared/rawBody";
 
 export const config = { api: { bodyParser: false } };
