@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/slack/command", "dest": "api/slack-command.ts" },
+    { "src": "/slack/interactions", "dest": "api/slack-interact.ts" }
+  ]
+}

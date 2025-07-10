@@ -6,8 +6,10 @@
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^6.13.0",
     "axios": "^1.10.0",
+    "axios-retry": "^4.5.0",
     "next": "^15.3.4",
-    "qs": "^6.14.0"
+    "qs": "^6.14.0",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@types/qs": "^6.14.0"
