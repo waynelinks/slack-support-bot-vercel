@@ -35,8 +35,18 @@ export default async function slackCommand(
   const form = new URLSearchParams(raw);
   const body = Object.fromEntries(form) as unknown as SlashCommandPayload;
 
-  if ((body.text ?? "").trim().toLowerCase() !== "new") {
-    res.status(200).send("Try `/balance new` to create a support ticket.");
+  if ((body.text ?? "").trim().toLowerCase() === "new") {
+    // ⬅ 1. respond immediately
+    res.status(200).end();
+
+    // ⬅ 2. then open modal *without awaiting the response*
+    void slackClient.post("/views.open", {
+      trigger_id: body.trigger_id,
+      view: buildSupportTicketModal({
+        channel_id: body.channel_id,
+        user_id: body.user_id,
+      }),
+    });
     return;
   }
 
